@@ -7,6 +7,13 @@ module.exports.getUser = async (id) => {
 
 }
 
+module.exports.Login = async (email) => {
+    const existingUser = await User.findOne({email: email})
+    
+    return existingUser ? existingUser : 'No existing User'
+
+}
+
 module.exports.createUser = async (requestBody) => {
     const {name, email, password} = requestBody
 

@@ -1,6 +1,19 @@
 const express = require('express');
 const router = express.Router();
-const {getUser, createUser, getAllUsers, updateUser, deleteUser} = require('../controllers/authController')
+const {getUser, createUser, getAllUsers, updateUser, deleteUser, Login} = require('../controllers/authController')
+
+router.post('/login', async (req, res) => {
+    // console.log(req.params.id)
+
+    try{
+        const result = await Login(req.body.email)
+        // console.log(result)
+        res.send(result)
+    } catch(e){
+        res.send(e.message)
+    }
+})
+
 
 router.get('/:id', async (req, res) => {
     // console.log(req.params.id)
@@ -9,6 +22,8 @@ router.get('/:id', async (req, res) => {
     // console.log(result)
     res.send(result)
 })
+
+
 
 router.post('/', async (req, res) => {
     const result = await createUser(req.body)
