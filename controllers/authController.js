@@ -1,4 +1,8 @@
 const User = require('../models/Auth');
+const updateUser = require("../utils/cloudinary");
+// Require the cloudinary library
+const cloudinary = require('../utils/cloudinary')
+
 
 module.exports.getUser = async (id) => {
     const existingUser = await User.findById(id)
@@ -38,20 +42,45 @@ module.exports.getAllUsers = async (id) => {
     
     return allUsers ? allUsers : []
 }
+ 
 
-module.exports.updateUser = async (requestBody, id) => {
-    const {name, email, password} = requestBody
-    const newUpdate = {
-        name,
-        email,
-        password
-    }
 
-    console.log(newUpdate)
-
-    const existingUser = await User.findByIdAndUpdate(id, newUpdate, {new:true})
+module.exports.updateUserProfile = async (req, res, next) => {
     
-    return {message: `${name}'s details has been updated`, existingUser}
+        try{
+            //Find the login user
+            const id = req.params.id;
+
+            //1. Get the image path
+            const file = req.files.image.tempFilePath
+
+            // Get the response from cloudinary
+            const result = await cloudinary.uploader.upload(file, {
+              public_id: `${Date.now()}`,
+              resource_type: "auto",
+              folder: "profilePic"
+            })
+            
+            const findUser = await User.findByIdAndUpdate(id, {
+                image: {
+                    public_id: result.public_id,
+                    secure_url: result.secure_url
+                }
+            },
+                {
+                    new: true
+                }
+            )
+
+            res.send(findUser)
+        
+          }catch(e){
+            res.send(e.message)
+          }
+}
+
+module.exports.updateUser = async (req, res, next) => {
+    console.log('Hi from updateUser')
 }
 
 
